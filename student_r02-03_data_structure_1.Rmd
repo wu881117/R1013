@@ -1,0 +1,213 @@
+---
+title: "2-3 資料結構I"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2-3-1 R 語言資料結構
+
+主要資料結構
+
+- 一維
+  - 向量 (vector)
+  - 因子向量 (factor)
+- 二維
+  - 矩陣 (matrix)
+  - 資料框 (data.frame)
+  - 資料表 (data.table)
+- 多維
+  - 陣列 (array)
+  - 清單 (list)
+
+## 2-3-2 vector
+
+### 創建
+```{r}
+
+# Vector of strings
+
+
+# Vector of numerical values
+
+
+# Vector of logical values
+
+
+# vector內 不是同資料型態時
+
+
+```
+
+### 調用元素
+
+```{r}
+fruits <- c("banana", "apple", "orange")
+
+# 查看長度
+
+
+# 調用 指定位置元素
+
+
+# 調用 多個元素
+
+
+# 排除 指定位置元素
+
+
+```
+
+### 更動元素
+
+```{r}
+
+
+# 更改指定元素位置
+
+
+# 新增元素 - 至最後位置
+
+
+# 新增元素 - 至指定索引位置
+
+
+## 合併兩個 vector
+
+
+
+```
+
+### seq函數
+```{r}
+
+
+```
+
+## 2-3-3 factor
+
+### 創建 factor
+```{r}
+# Create a factor
+
+```
+
+### 查看與調用元素
+```{r}
+# 查看 factor levels
+
+
+# 查看長度
+
+
+# 查看元素
+
+
+```
+
+### 更動元素
+```{r}
+factor_grades <- factor(c("A", "B", "A", "B", "C", "C", "C", "A"))
+
+# 將索引 1 改成C
+
+
+# 會 Warning 
+factor_grades[1] <- "D" # 因子層次不正確，產生 NA
+factor_grades
+```
+
+
+## 2-3-4 list
+
+### 創建
+```{r}
+
+```
+
+### 查看與調用元素
+```{r}
+list_1 <- list(
+  c("black", "yellow", "orange"),
+  c(T, T, F, T, F, F),
+  "5"
+)
+
+thislist <- list("apple", "banana", "cherry")
+
+# 查看
+
+
+# 調用 list 中 vector內 的元素
+
+
+
+```
+
+### 更動元素 
+```{r}
+
+# 更動範例 1
+thislist <- list("apple", "banana", "cherry")
+
+
+```
+
+```{r}
+# 更動範例 2
+list_1 <- list(
+  c("black", "yellow", "orange"),
+  c(T, T, F, T, F, F),
+  "5"
+)
+
+```
+
+
+## 課堂練習
+
+### 練習1
+```{r}
+
+# Q1: 創建一向量 vec_1，其有 10至100 的整數
+
+
+# Q2: 查看向量 vec_1 之長度
+
+
+```
+
+
+### 練習2
+```{r}
+
+fruits <- c("banana", "apple", "orange", "mango", "lemon")
+
+# Q1: 取出 fruits 索引值 1 位置之元素
+
+
+# Q2: 取出 fruits 索引值 2-4 位置之元素
+
+
+# Q3: 將 fruits 做排序
+
+
+```
+
+### 練習3
+```{r}
+repeat_each <- rep(c(1,2,3), each = 3)
+
+
+# Q1: 將 repeat_each 專為 factor型態，存於 factor_1 變數
+
+
+
+# Q2 查看 factor_1 之 levels
+
+
+```

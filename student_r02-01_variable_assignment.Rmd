@@ -1,0 +1,146 @@
+---
+title: "2-1 變數與賦值"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## 2-1-1 第一行程式碼
+
+```{r 第一行程式碼}
+
+
+```
+
+## 2-1-2 變數與賦值
+
+```{r 變數與賦值}
+# 賦值: 將右側的值，"賦予"給左側的變數
+
+
+```
+
+## 2-1-3 基礎運算符號
+```{r 加與減}
+# Addition and subtraction: 加與減
+
+
+```
+
+```{r 乘與除}
+# Multiplication and division: 乘與除
+
+
+```
+
+```{r 指數}
+# Exponentiation: 指數(次方)
+
+
+
+# Root: 平方根
+
+```
+
+```{r 商數}
+# Floor Division 取整除 - 返回商的整数部分
+
+
+```
+
+
+```{r 餘數}
+# Modulo: 餘數
+
+
+```
+
+## 2-1-4 Print or not, what's the diffence?
+
+- print()是r內建的基本函式之一。
+- 至於函式是什麼? 稍後就知道!
+
+```{r}
+5
+
+```
+
+```{r}
+print(5)
+
+```
+
+## 2-1-5 多個變數與計算
+
+story:
+
+- 我的手上現有資金100元。
+- 從今年為第一年開始，投資一筆年利率為10%複利計算之標的。
+- 請計算7年後之資金額為多少。
+
+```{r 多個變數與計算}
+
+# Assign Variables
+
+
+
+# Caculate for the result
+
+
+
+# Print out result
+
+
+```
+
+## 2-1-6 重新賦值
+
+```{r 重新賦值1}
+# Assign 10 to var1
+
+
+# Check var1 
+
+
+```
+
+```{r 重新賦值2}
+# Reassignment var1
+
+
+# Check var1
+
+
+```
+
+## 2-1-7 刪除已命名之變數
+
+```{r}
+
+# var1 # 錯誤: 找不到物件 'var1'
+
+```
+
+## 2-1-8 變數命名限制
+
+Reserved Words in R
+
+- https://stat.ethz.ch/R-manual/R-devel/library/base/html/Reserved.html
+
+```{r}
+
+# 賦值公式左側無效
+# 1a <- 5
+```
+
+## 2-1-9 命名風格
+
+> 好的寫作習觀與註解，能減少維護/協作/開發的成本。
+
+- [Tidyverse Style Guide](https://style.tidyverse.org/index.html)
+- [Google R Style Guide](http://web.stanford.edu/class/cs109l/unrestricted/resources/google-style.html)

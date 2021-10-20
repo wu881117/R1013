@@ -1,0 +1,264 @@
+---
+title: "2-3 資料結構I"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2-3-1 R 語言資料結構
+
+主要資料結構
+
+- 一維
+  - 向量 (vector)
+  - 因子向量 (factor)
+- 二維
+  - 矩陣 (matrix)
+  - 資料框 (data.frame)
+  - 資料表 (data.table)
+- 多維
+  - 陣列 (array)
+  - 清單 (list)
+
+## 2-3-2 vector
+
+### 創建
+```{r}
+
+# Vector of strings
+fruits <- c("banana", "apple", "orange")
+class(fruits)
+typeof(fruits)
+
+# Vector of numerical values
+numbers <- c(1, 2, 3) # numbers <- 1:3
+class(numbers)
+typeof(numbers)
+
+# Vector of logical values
+log_values <- c(TRUE, FALSE, TRUE, FALSE)
+class(log_values)
+typeof(log_values)
+
+# vector內 不是同資料型態時
+tmp1 <- c(1, "2")
+tmp2 <- c(1, TRUE)
+tmp3 <- c("3", 3)
+
+```
+
+### 調用元素
+
+```{r}
+fruits <- c("banana", "apple", "orange")
+
+# 查看長度
+length(fruits)
+
+# 調用 指定位置元素
+fruits[1]
+fruits[3]
+fruits[4] # NA
+
+# 調用 多個元素
+fruits[1:3] # fruits[c(1:3)]
+fruits[c(1, 3)]
+
+# 排除 指定位置元素
+fruits[-1]
+fruits[-3]
+fruits[-1:-2]
+fruits[-c(1:2)]
+
+```
+
+### 更動元素
+
+```{r}
+fruits <- c("banana", "apple", "orange")
+
+# 更改指定元素位置
+fruits[1] 
+fruits[1] <- "bala"
+fruits
+
+# 新增元素 - 至最後位置
+fruits <- append(fruits, "cherry")
+fruits
+
+# 新增元素 - 至指定索引位置
+fruits <- append(values = fruits, after = 2, x = "melon")
+fruits
+
+## 合併兩個 vector
+v1 <- 1:3
+v2 <- 4:6
+
+c(v1, v2)
+
+
+```
+
+### seq函數
+```{r}
+
+numbers <- seq(from = 0, to = 100, by = 20)
+numbers
+
+```
+
+## 2-3-3 factor
+
+### 創建 factor
+```{r}
+# Create a factor
+factor_grades <- factor(c("A", "B", "A", "B", "C", "C", "C", "A"))
+factor_grades
+```
+
+### 查看與調用元素
+```{r}
+# 查看 factor levels
+levels(factor_grades)
+nlevels(factor_grades)
+
+# 查看長度
+length(factor_grades)
+
+# 查看元素
+factor_grades[7]
+
+```
+
+### 更動元素
+```{r}
+factor_grades <- factor(c("A", "B", "A", "B", "C", "C", "C", "A"))
+
+# 將索引 1 改成C
+factor_grades[1] <- "C"
+factor_grades
+
+# 會 Warning 
+factor_grades[1] <- "D" # 因子層次不正確，產生 NA
+factor_grades
+```
+
+
+## 2-3-4 list
+
+### 創建
+```{r}
+list_1 <- list(
+  c("black", "yellow", "orange"),
+  c(T, T, F, T, F, F),
+  "5"
+)
+
+list_2 <- list(
+  colors = c("black", "yellow", "orange"),
+  evaluation = c(T, T, F, T, F, F),
+  "5"
+)
+
+```
+
+### 查看與調用元素
+```{r}
+list_1 <- list(
+  c("black", "yellow", "orange"),
+  c(T, T, F, T, F, F),
+  "5"
+)
+
+thislist <- list("apple", "banana", "cherry")
+
+# 查看
+length(list_1)
+class(list_1)
+typeof(list_1)
+
+
+# 調用 list 中 vector內 的元素
+thislist[[1]]
+list_1[[1]][1]
+
+
+```
+
+### 更動元素 
+```{r}
+
+# 更動範例 1
+thislist <- list("apple", "banana", "cherry")
+
+thislist[1] <- "blackcurrant1"
+thislist[[1]] <- "blackcurrant2"
+thislist
+```
+```{r}
+# 更動範例 2
+list_1 <- list(
+  c("black", "yellow", "orange"),
+  c(T, T, F, T, F, F),
+  "5"
+)
+
+list_1[[1]] <- c("a", "b", "c")
+list_1
+
+list_1[[1]] <- 50
+list_1
+
+list_1[[1]] <- c(1, 2, 3)
+list_1
+
+```
+
+
+## 課堂練習
+
+### 練習1
+```{r}
+
+# Q1: 創建一向量 vec_1，其有 10至100 的整數
+vec_1 <- c(10:100)
+
+# Q2: 查看向量 vec_1 之長度
+length(vec_1)
+
+```
+
+
+### 練習2
+```{r}
+
+fruits <- c("banana", "apple", "orange", "mango", "lemon")
+
+# Q1: 取出 fruits 索引值 1 位置之元素
+fruits[1]
+
+# Q2: 取出 fruits 索引值 2-4 位置之元素
+fruits[2:4]
+
+# Q3: 將 fruits 做排序
+sort(fruits)
+
+```
+
+### 練習3
+```{r}
+repeat_each <- rep(c(1,2,3), each = 3)
+
+
+# Q1: 將 repeat_each 專為 factor型態，存於 factor_1 變數
+factor_1 <- factor(repeat_each)
+
+
+# Q2 查看 factor_1 之 levels
+levels(factor_1)
+
+```

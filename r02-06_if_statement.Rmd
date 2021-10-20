@@ -1,0 +1,130 @@
+---
+title: "2-6 條件判斷"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2-6-1 if-else 語句
+
+```{r}
+height <- 170
+
+if (height  >= 160) {
+  print("可以玩遊樂設施")
+} else {
+  print("不可以玩遊樂設施")
+}
+
+```
+
+```{r}
+mood_score <- 50
+
+if (mood_score >= 60) {
+  print("可以澀澀")
+} else {
+  print("不可以澀澀")
+}
+
+```
+
+## 2-6-2 if-eles if-else 語句
+
+
+```{r}
+score <- 72
+
+if (score  >= 90) {
+  print("90分以上")
+} else if (score >= 80) {
+  print(">=80分")
+} else if (score >= 70) {
+  print(">=70分")
+} else if (score >= 60) {
+  print(">=60分")
+} else {
+  print("<60分")
+}
+
+```
+
+## 2-6-3 巢狀 if 語句
+
+
+```{r}
+math_score <- 95 
+english_score <- 55
+
+if(math_score>=60){
+  if (english_score>=60) {
+    print("全部PASS")
+  } else {
+    print("數學PASS，英文QQ")
+  }
+} else {
+  if (english_score>=60) {
+    print("數學QQ，英文PASS")
+  } else {
+    print("全部QQ")
+  }
+}
+
+# 這樣寫..要是不只兩科目怎麼辦呢...? 程式碼不就超長=_=+ ? -> r03-02 函數!
+```
+
+
+## 2-6-4 ifelse 函數
+
+```{r}
+# example 1
+money <- 120
+
+ifelse(money >=70, "ok", "not ok")
+
+# example 2 - 用於向量
+prices <- c(30, 90, 50, 60, 80)
+ifelse(prices<=50, "50元買得起!", "50元零用錢買不起")
+
+```
+
+
+## 課堂練習: 是否為閏年
+
+閏年的規則如下:
+
+- 西元年份除以4不可整除，為平年。
+- 西元年份除以4可整除，且除以100不可整除，為閏年。
+- 西元年份除以100可整除，且除以400不可整除，為平年。
+- 西元年份除以400可整除，為閏年。
+
+可用幾個年份做測試:
+
+- 平年
+  - 1999, 2100, 2200
+- 閏年
+  - 2000, 2004, 2012
+
+```{r}
+
+year = 2012
+
+# 解法 1
+if (year %% 4 == 0) {
+  if (year %% 100 == 0){
+    if (year %% 400 == 0) {
+      cat(year, "是閏年")
+    } else {
+      cat(year, "是平年")
+    }
+  } else {
+    cat(year, "是閏年")
+  }
+} else {
+  cat(year, "是平年")  }
+
+```

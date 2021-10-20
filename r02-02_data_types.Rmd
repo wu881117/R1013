@@ -1,0 +1,150 @@
+---
+title: "2-2 資料型態"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2-2-1 R的資料型態(Data Types)
+
+主要包括 
+
+- 字串(haracter): "Apple", "K", "1", 'Test'
+- 數值(numeric): 3, 21.6
+- 整數(integer): 2L, 3L
+- 邏輯/布林(logical): TRUE, FALSE
+- 複數(complex): 2+3i
+- 時間(Date-Time): 
+
+### 字串
+```{r 字串}
+chr_1 <- "Test"
+chr_2 <- '01'
+
+# 查看字串長度，注意不是用length
+nchar(chr_1)
+
+class(chr_2)
+```
+
+### 數值
+```{r 數值}
+num_1 <- 20
+num_2 <- 50.123
+
+class(num_1)
+```
+
+### 整數
+```{r 整數}
+int_1 <- 10L
+class(int_1)
+
+# 整數實字 10.0L 含有非必要的小數點，但仍是整數
+int_2 <- 10.0L
+class(int_2)
+
+# 整數實字 10.5L 含有小數；使用數值(numeric)
+int_fail <- 10.5L
+class(int_fail)
+
+```
+
+### 邏輯
+```{r 邏輯}
+bool_1 <- TRUE
+bool_2 <- T
+bool_3 <- FALSE
+bool_4 <- F
+
+```
+
+### 複數
+
+```{r 複數}
+complex_1 <- 1+2i
+class(complex_1)
+```
+
+### 時間
+
+```{r 時間}
+sys_time <- Sys.time() # 拿系統時間
+print(sys_time)
+class(sys_time)
+
+
+# 將字串轉為時間
+national_day <- as.POSIXct("2021-10-10 08:00:00")
+national_day <- as.POSIXlt("2021-10-10 08:00:00", format="%Y-%m-%d %H:%M:%S")
+
+national_day - as.POSIXct("2021-10-09 08:00:00")
+
+# 透過 format 將時間轉為字串
+class(Sys.time())
+format(Sys.time(), "%Y-%m-%d")
+```
+
+## 2-2-2 查看資料型態
+
+- 是否為整數 is.interger
+- 是否為數值 is.numeric
+- 是否為字串 is.character
+- 是否為邏輯 is.logical
+
+```{r 確認資料型態}
+
+# 是否為整數
+is.integer(3)
+is.integer(3L)
+is.integer(3.6)
+
+# 是否為數值
+is.numeric(3.6)
+is.numeric("TEST")
+is.numeric(3L)
+
+# 是否為字串
+is.character(3.6)
+
+# 是否為邏輯
+is.logical(FALSE)
+
+```
+## 2-2-3 轉資料型態
+
+- 轉為整數 as.interger
+- 轉為數值 as.numeric
+- 轉為字串 as.character
+- 轉為邏輯 as.logical
+
+```{r 轉資料型態}
+
+# 轉為整數
+as.integer(3.6) # 3 無條件捨去
+as.integer(3) # 3 無條件捨去
+as.integer("t") # 不可轉，會出現 NA
+
+# 轉為數值
+as.numeric("100") # "100"
+as.numeric(F) # 0
+as.numeric("TEST") # 不可轉，會出現 NA
+
+# 轉為字串
+as.character(3.6) # "3.6"
+as.character(FALSE) # "FALSE"
+
+# 轉為邏輯
+as.logical(100) # TRUE
+as.logical(0) # FALSE
+
+```
+## 2-2-4 補充: 關於 typeof, class, mode
+
+- class() - 查看資料型態(high-level)。
+- mode() - 查看資料內元素型態(low-level)。
+- typeof() - 查看資料內元素型態(low-level)，較mode更詳細。

@@ -1,0 +1,275 @@
+---
+title: "2-4 資料結構II"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2-4-1 matrix
+
+### 創建
+```{r}
+t_matrix <- matrix(
+  c(1,2,3,4,5,6), 
+  nrow = , 
+  ncol = 
+)
+t_matrix
+
+```
+
+### 查看
+```{r}
+t_matrix <- matrix(
+  c(1,2,3,4,5,6), 
+  nrow = 3, 
+  ncol = 2
+)
+t_matrix
+
+
+# 型態
+
+
+# 維度
+
+
+# 長度
+
+
+```
+### 調用
+```{r}
+thismatrix <- matrix(
+  c("A", "B", "C", "D", "E", "F"), 
+  nrow = 2, 
+  ncol = 3
+)
+thismatrix
+
+# 取出 指定位置 (row, col)
+thismatrix
+
+# 取出 指定 row
+thismatrix
+thismatrix
+
+# 取出 指定 col
+thismatrix
+thismatrix
+
+```
+
+### 操作 - 新增row或column
+```{r}
+thismatrix <- matrix(
+  c("A", "B", "C", "D", "E", "F"), 
+  nrow = 2, 
+  ncol = 3
+)
+thismatrix
+
+# 新增 column
+
+
+# 新增 row
+
+
+# 注意當維度不同時候..
+
+```
+
+### 操作 - 刪除row或column
+```{r}
+thismatrix <- matrix(
+  c("A", "B", "C", "D", "E", "F"), 
+  nrow = 2, 
+  ncol = 3
+)
+thismatrix
+
+# 刪除row
+
+
+# 刪除column
+
+
+```
+
+### 操作 - 更動元素
+```{r}
+thismatrix <- matrix(
+  c("A", "B", "C", "D", "E", "F"), 
+  nrow = 2, 
+  ncol = 3
+)
+thismatrix
+
+
+thismatrix[1] <- 
+thismatrix
+
+```
+
+## 2-4-2 data.frame
+
+### 創建
+
+```{r}
+
+# 自建 data.frame
+df1 <- data.frame (
+  Fruit = c("Apple", "Banana", "Apple", "Orange"),
+  Price = c(100, 150, 120, 125)
+)
+df1
+
+# 查看型態
+
+
+# 查看 col row 長度
+
+```
+
+```{r}
+# 內建的資料集 data()
+cars_df <- cars
+
+```
+### 資料摘要
+```{r}
+
+# 數值欄位摘要
+summary(cars_df)
+
+# 前n筆
+
+
+# 後n筆
+
+
+# 開啟瀏覽頁
+
+
+```
+
+### 調用欄位
+```{r}
+titanic_df <- data.frame(Titanic)
+class(Titanic)
+class(titanic_df)
+
+# 檢視欄位
+
+
+# 調用特定 column
+titanic_df
+titanic_df
+titanic_df
+
+# 調用特定 column
+titanic_df
+titanic_df
+titanic_df
+
+# 調用特定 column
+titanic_df
+titanic_df
+titanic_df
+
+# 調用多個 columns
+titanic_df
+titanic_df
+
+```
+
+### 操作 - 新增row或column
+```{r}
+
+# 新增 row
+df <- data.frame (
+  Fruit = c("Apple", "Banana", "Apple", "Orange"),
+  Price = c(100, 150, 120, 125)
+)
+
+df <- (df, c("Cherry", 110))
+df
+
+# 新增 column
+df <- data.frame (
+  Fruit = c("Apple", "Banana", "Apple", "Orange"),
+  Price = c(100, 150, 120, 125)
+)
+
+df <- (df, Weight = c(50, 55, 35, 60))
+df
+
+```
+### 操作 - 刪除row或column
+```{r}
+df <- data.frame (
+  Fruit = c("Apple", "Banana", "Apple", "Orange"),
+  Price = c(100, 150, 120, 125)
+)
+
+# 刪除 row
+
+
+# 刪除 column
+
+
+```
+
+## 2-4-3 data.table
+
+```{r}
+
+df1 <- data.frame (
+  Training = c("Strength", "Stamina", "Other"),
+  Pulse = c(100, 150, 120),
+  Duration = c(60, 30, 45)
+)
+
+library("data.table")
+dt1 <- data.table(df1)
+
+dt1[Pulse>100]
+
+```
+
+
+## 課堂練習
+
+### 練習1
+```{r}
+
+# 請嘗試以以下資料建立一個 data.frame df
+
+user_names <- c("Ken", "Jen", "Max")
+grades <- c(90, 92, 89)
+
+df <- 
+```
+
+### 練習2
+```{r}
+# 請嘗試以 cars_df 資料 回答以下問題
+cars_df <- cars
+
+# Q1: 請使用進行摘要
+
+
+# Q2: 請問 cars_df 共有幾 rows, 幾 columns
+
+
+# Q3: 請選出 speed 欄位的資料
+
+
+# Q4: 請問 speed 欄位最大值為何
+
+
+```

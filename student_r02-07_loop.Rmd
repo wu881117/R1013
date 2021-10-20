@@ -1,0 +1,186 @@
+---
+title: "2-7 迴圈"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2-7-1 for loop
+
+### 1 為何要用 loop
+```{r}
+nums <- c(10, 20, 30, 40, 50)
+
+# 印出num_list中的數字
+print(nums[1])
+print(nums[2])
+print(nums[3])
+print(nums[4])
+print(nums[5])
+
+```
+
+### 2 for loop with vector
+```{r}
+nums <- c(10, 20, 30, 40, 50)
+
+# 用for loop印出印出 nums 中的數字
+
+
+```
+
+```{r}
+nums <- c(10, 20, 30, 40, 50)
+
+# 用 x ，也是可以執行的。
+
+
+```
+
+### 3 for loop with if-else
+```{r}
+
+grades = c(80, 70, 69, 50, 92)
+
+
+
+```
+
+### 4 break?
+```{r}
+
+fruits <- list("apple", "banana", "cherry")
+
+
+```
+
+### 5 next?
+```{r}
+
+fruits <- list("apple", "banana", "cherry")
+
+
+
+```
+
+### 6 巢狀 for loop
+```{r}
+
+adj <- list("red", "big", "tasty")
+fruits <- list("apple", "banana", "cherry")
+
+
+
+```
+
+## 2-7-2 while loop
+
+> 請注意：判斷條件若使用不善，可能會產生無限迴圈(infinite loop)！！！
+
+### 1 basic while
+```{r}
+age <- 10
+
+while (age < 18){
+    print(paste0("現在", age, "歲, 沒滿18歲還不能喝酒喔"))
+    age <- age +1
+}
+
+```
+
+### 2 while with break
+```{r}
+
+
+```
+
+### 3 while with next
+```{r}
+
+
+```
+
+### 4 無限迴圈
+```{r}
+# 注意: 這區塊內程式碼會造成無限迴圈
+# while (TRUE){
+#   print("1")
+# }
+
+```
+
+## 2-7-3 迴圈常用技巧
+
+### 1 使用 seq() 創建數值vector
+```{r}
+
+seq(1, 5)
+seq(1, 5, by=2)
+
+```
+
+### 2 遍歷元素時，同時拿到index
+```{r}
+
+items <- seq(1, 10)*5
+
+
+
+```
+
+## 課堂練習
+
+### 練習1 奇數偶數
+```{r}
+
+num_list = c(1, 2, 3, 4, 5, 6)
+
+# 使用 for loop 遍歷 num_list 內元素
+# 判斷為奇數或是偶數，並print出結果
+
+
+```
+
+### 練習2 賣蘋果
+
+請以 for-loop 實現以下情境題:
+- 在 apple_price 中，有賣蘋果的小男孩能賣出的蘋果價格。
+- 蘋果價格如果<=15 元，蘋果就跳過不賣。
+- 總共賣出的金額達到 150 元時，就停止賣。
+
+
+```{r}
+apple_price <- c(16, 5, 30, 25, 5, 50, 36, 15, 10, 25)
+
+```
+
+### 練習3 猜數字
+
+- 產出 1個隨機數字(1~999)。
+- 使用while迴圈
+  - 於迴圈內讀取用戶輸入的數字。
+  - 判斷用戶輸入的數字是否正確。
+    - 正確即跳出迴圈。
+    - 錯誤則提示數字要小點還是大一點。
+
+```{r}
+# 產出 1個隨機數字
+answer <- sample(1:999, size=1)
+answer
+
+```
+```{r}
+# 輸入 數字範例
+x<-readline(prompt = "請填入 1~999的數字: \n")
+print(x)
+
+```
+
+```{r eval = FALSE}
+# 參考解答
+  
+```
