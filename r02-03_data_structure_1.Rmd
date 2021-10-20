@@ -86,12 +86,13 @@ fruits[1]
 fruits[1] <- "bala"
 fruits
 
+
 # 新增元素 - 至最後位置
 fruits <- append(fruits, "cherry")
 fruits
 
 # 新增元素 - 至指定索引位置
-fruits <- append(values = fruits, after = 2, x = "melon")
+fruits <- append(x = fruits,  after = 2, values = "melon")
 fruits
 
 ## 合併兩個 vector
