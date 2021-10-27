@@ -1,0 +1,481 @@
+---
+title: "3-2 函數"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1 函數是什麼
+
+> 函數就像一台果汁機, 丟進水果, 輸出果汁, 完成了特定工作。
+
+語法: 
+
+```r
+函數名稱 <- function(參數1, 參數2, ...){
+  # 函數工作
+}
+
+```
+
+舉例：
+```r
+say_hello <- function(){
+  print("hello!")
+}
+
+```
+
+## 2 不吃參數的function
+
+```{r}
+say_hello <- function(){
+  print("hello!")
+}
+
+say_hello()
+
+```
+
+## 3 吃參數的function
+
+### 3.1 無預設的固定數量參數
+```{r}
+
+plus_two_nums <- function(a, b){
+  ans <- a + b
+  print(ans)
+}
+    
+# 3.1a 利用"a=__" "b=__" 進行明確指定
+plus_two_nums(a=5, b=6)
+
+# 3.1b 利用參數順序進行指定
+v1 <- 10
+v2 <- 20
+plus_two_nums(v1, v2)
+
+
+# 3.1c 該給吃卻沒吃...
+# 應該要賦值給a, b兩個參數, 但卻沒有 >> 會報錯
+# plus_two_nums() # 錯誤發生在 plus_two_nums()：缺少引數 "a"，也沒有預設值
+
+```
+
+### 3.2 有預設值的固定參數
+```{r}
+
+# 建議"有預設參數", 放在"沒有預設之參數"後方喔
+say_welcome_msg <- function(c_name, welcome_msg="Hellooooo~~~ "){
+  msg <- paste0(welcome_msg, c_name)
+  print(msg)
+}
+    
+# 3.2a 預設參數可不賦值
+say_welcome_msg(c_name="kbjiyu")
+
+# 3.2b 預設參數可更改
+say_welcome_msg(c_name="Kobe", welcome_msg="WOW!!")
+
+# 3.2c 在有指定參數名時，參數順序可改
+say_welcome_msg(c_name="Jude", welcome_msg="Hey!")
+say_welcome_msg(welcome_msg="Hey!", c_name="Jude")
+
+# 比較不好的function寫法
+# say_welcome_msg <- function(welcome_msg="Hellooooo~~~ ", c_name){
+  # msg <- paste0(welcome_msg, c_name)
+  # print(msg)
+# }
+
+```
+
+### 3.3 注意參數的指定式有順序性的
+```{r}
+
+# 在不使用(c_name=___)明確指定的情況設定參數時, 要確定函式的參數輸入順序 
+order_ticket <- function(c_name, c_age, ticket_price=100){
+  print(paste0("your_name: ", c_name))
+  print(paste0("your_age: ", c_age))
+  print(paste0("tick_price: ", ticket_price))
+  print(paste0("========================================="))
+}
+
+# 3.3a 正確對應
+order_ticket("KBJIYU", 85)
+
+# 3.3b 錯誤對應
+order_ticket(85, "KBJIYU")
+
+# 3.3c 不好的寫法
+order_ticket(ticket_price=110, 85, "KBJIYU")
+
+# 3.3d 可接受的寫法
+order_ticket(85, "KBJIYU", ticket_price=110)
+
+```
+
+
+## 4 變數作用域(variable scope)!
+
+- 示意:     
+
+```r
+# 外部作用域 ##
+
+test_func <- function(){
+  ## function內部作用域 開始 ##############################################
+  # DO SOMETHING 
+  ## function內部作用域 結束 ##############################################
+}
+
+# 外部作用域 ##
+
+```
+
+學習重點: 
+- 重點1: 在函數當中宣告的變量, 僅會作用於函數內。
+- 重點2: 在函數引用的變量, 要注意是否存在於全局變量當中。(你知道你的變量在哪嗎?)
+- 注意: global variables 和 local variables的概念很重要der。
+
+### 4.1 注意 全域vs區域
+```{r}
+
+test_func <- function(){
+  a <- 10 # <-注意這只會作用在此function當中
+  print(paste0('在函式中, a的值現為: ', a))
+  print('=================================') 
+}
+
+# 在全局(或函式之外部)環境中, a 賦值為5
+a <- 5
+    
+# 函式內部的 a 賦值為 10
+test_func()
+
+# 但是在函式執行之後, 會發現全局的 a 仍然是5; 因為在
+print(paste0('但在函式作用於之外a的值為: ', a))
+
+```
+
+### 4.2 指名 變數來源!
+
+#### 比較好的寫法
+```{r}
+check_flower_betterway <- function(flower_type){
+  print(flower_type)
+}
+    
+flower_type_1 <- "rose"
+check_flower_betterway(flower_type_1)
+
+```
+
+#### 比較糟的寫法
+```{r}
+
+check_fruit_type <- function(){
+  print(fruit_type)
+}
+    
+fruit_type <- "APPLE"
+check_fruit_type()
+
+# 上述範例中，要是在環境中沒有 fruit_type ...範例如下
+# 可能產生: 誤用全域變數/ 不知道用了全域變數/ 沒有將函式單純抽出為可重複執行
+
+```
+
+```{r}
+check_fruit_type2 <- function(){
+  print(fruit_type2)
+}
+# check_fruit_type2() # 錯誤發生在 print(fruit_type2)：找不到物件 'fruit_type2'
+
+```
+
+### 4.3 想覆蓋全域的話...
+
+```{r}
+
+```
+
+
+## 5 關於function的return
+
+### 5.1 不使用return
+- r會預設返回 function 中，最後一行的結果。
+- 所以要特別注意!
+```{r}
+check_age_above_18 <- function(age){
+  is_above_18 <- age >= 18
+}
+
+check_age_above_18(20) # TRUE
+
+a <- check_age_above_18(25)
+print(a)  # TRUE
+```
+
+### 5.2 使用return
+- 增加易讀性。
+- 確認並指定返回值是什麼。
+
+```{r}
+check_age_above_18 <- function(age){
+  is_above_18 <- age >= 18
+  print(paste("age", age, "is above 18?:", is_above_18))
+  
+  return(is_above_18) # 註解掉這行試試看，結果還會是你要的嗎?
+}
+
+res <- check_age_above_18(20)
+res
+
+```
+## 6 函數當作參數
+
+- 函數也可以當作參數做傳遞或調用。
+
+```{r}
+
+main_func <- function(s) {
+  print(s)
+}
+
+mask_func <- function(s, f) {
+  f(s)
+}
+
+
+mask_func("A", main_func)
+
+```
+
+
+
+## 7 關於function的撰寫, 注意不要太複雜了
+
+- 一個好的function應該是"目的很明確"。
+- 一個好的function應該是"命名上要很清楚"。
+
+### 7.1 目的不明確的情況
+
+- 可能做太多事情了，或是太複雜了。
+- 應該進行步驟抽出單純化與重新構成function。
+
+
+#### 舉例
+```{r}
+
+calc_total_price <- function (
+  apple_c, apple_p, orange_c, orange_p, discount_p, discount_percent){
+  # 第一件事情, 計算apple總價
+  apple_total <- apple_c*apple_p
+  # 第二件事情, 計算orange總價
+  orange_total <- orange_c*orange_p
+  # 第三件事情, 計算加總
+  total_price <- apple_total + orange_total
+  # 第四件事情, 打折
+  if (total_price >= discount_p){
+    total_price <- total_price * discount_percent
+  }      
+  return(total_price)
+}
+
+apple_c <- 10
+apple_p <- 20
+orange_c <- 5
+orange_p <- 15
+discount_p <- 250 
+discount_percent <- 0.95    
+calc_total_price(apple_c, apple_p, orange_c, orange_p, discount_p, discount_percent)
+
+```
+
+#### 改寫
+- 目的明確的情況(將上述calc_total_price 進行拆解與單純化)。
+- 以下僅為舉例, 並非最優或唯一寫法。
+
+```{r}
+
+calc_fruit_origin <- function(fruit_c, fruit_p){
+    fruit_origin <- fruit_c*fruit_p
+    
+    return(fruit_origin) 
+}
+
+calc_discounted_price <- function(origin_p, discount_p, discount_percent){
+    final_price <- origin_p
+    if (origin_p > discount_p){
+      final_price <- final_price*discount_percent      
+    }
+
+    return(final_price)
+}
+    
+    
+apple_origin <- calc_fruit_origin(apple_c, apple_p)
+orange_origin <- calc_fruit_origin(orange_c, orange_p)
+origin_total <- apple_origin + orange_origin
+discounted_total <- calc_discounted_price(origin_total, discount_p, discount_percent)
+discounted_total
+
+```
+
+### 7.2 命名不清楚的情況
+
+#### 舉例
+```{r}
+calc_nums <- function(nums){
+    avg <- sum(nums)/length(nums)
+    return(avg)
+}
+
+calc_nums(c(10, 20))
+
+```
+
+#### 改寫
+```{r}
+# 命名較為清楚的情況
+# (看個人習慣, 以及縮寫的慣性與命名的重要, 可參考此書- 易讀程式之美學)
+calc_avg <- function(nums){
+    avg <- sum(nums)/length(nums)
+    return(avg)
+}
+
+calc_avg(c(10,20,30))
+
+```
+
+## 8 關於function的註解/ 指定參數類型
+
+- 函式註解: 
+  - 讓自己與別人都明瞭這function的使用規範和目的。
+  - 參考 [tidyverse r coding style](https://style.tidyverse.org/documentation.html) 
+
+```{r}
+
+say_hello <- function(targetName) {
+  #' @title 說 Hello
+  #' @description 
+  #' 此函數目的為說 Hello。
+  
+  #' @details
+  #' bra brabrabra....
+  #' bra brabrabra....  
+  
+  #' @param targetName 目標姓名, 字串
+
+  #' @examples
+  #' say_hello("Jay")
+  
+  print(targetName)
+}
+
+say_hello("Allen")
+```
+
+
+## 9 functions or methods? 有差嗎
+
+- function
+  - 現在我們學到了, 怎麼自己寫一個function!
+  - 我們常常使用到的print(), 就是一個R內建的function。
+- methods
+  - 接下來, 我們會學習到何謂"物件(Object)"。
+  - 而所謂的methods, 其實就是"物件所具有的function!。
+  - 所以功能和寫法都很類似, 只是應用的場景和方式稍微不同~
+
+## 10 關於遞迴函數
+
+範例-階乘(Factorial) n!
+
+### loop寫法
+```{r}
+factorial_loop <- function(n){
+  factor = 1
+  for (i in c(1:n)){
+    factor = factor * i
+  }
+  return(factor)
+}
+
+factorial_loop(5)
+```
+
+### 遞迴(recursion)寫法
+```{r}
+factorial <- function(n) {
+  if (n == 0 | n == 1){
+    return(1)    
+  }
+  else {
+      return (n*factorial(n - 1))
+  }
+}
+
+factorial(5)
+
+```
+
+## 練習
+
+### 練習1 - 計算 BMI
+
+- 請寫出一函數 calc_bmi(height_m, weight_kg)，計算並返回 bmi值。
+```{r}
+calc_bmi <- function(height_m, weight_kg) {
+
+}
+
+calc_bmi(1.76, 70)
+```
+
+### 練習2 - 遞迴函數
+
+- 請寫出一個 遞迴函數 print_numSeq(num)
+- 功能為輸入 3 印出 123，輸入 5 印出 12345。
+```{r}
+
+print_numSeq <- function(num) {
+
+}
+print_numSeq(5)
+
+```
+
+### 練習3 將數字做分組轉換
+
+撰寫 函數 cut_numGroup(num)，
+將 向量d內的數字，依據以下規則做分組轉換
+
+- > 50, "A_51up"
+- 31-50, "B_31_50"
+- 11-30, "C_11_30"
+- <= 10, "D_0_10"
+
+並將結果存於 向量 group_d 中
+
+```{r}
+d <- c(1, 2, 3, 4, 5, 9, 10, 17, 20,21, 25, 30, 35, 40, 50, 100, 110, 120)
+
+cut_numGroup <- function(num) {
+
+}
+
+# 迴圈方式
+group_d <- c()
+
+for (i in c(1:length(d))){
+
+}
+
+# lapply方式(稍後章節)
+# lapply(d, cut_numGroup)
+
+```

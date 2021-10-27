@@ -1,0 +1,180 @@
+---
+title: "3-1 字串處理"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1 數值轉字串 
+
+### 1.1 sprintf
+- [C-style formatting options](https://www.gastonsanchez.com/r4strings/c-style-formatting.html#c-style-formatting-options)
+```{r}
+num <- 1.2387
+sprintf("數字為: %.3f", num)
+
+sprintf("%.2f", num)
+```
+
+### 1.2 formatC
+```{r}
+num <- 1.23456789
+formatC(num, digits = 5)
+
+```
+
+### 1.3 as.character
+```{r}
+num <- 1.23456789
+as.character(num)
+
+```
+
+## 2 字串合併
+
+### 2.1 paste
+```{r}
+user_name <- "Tom"
+paste("Hello", user_name, sep = "~~")
+
+```
+
+### 2.2 變數in字串-sprintf
+- [C-style formatting options](https://www.gastonsanchez.com/r4strings/c-style-formatting.html#c-style-formatting-options)
+
+```{r}
+item <- "the apple"
+weight <- 3.2
+
+# 範例1
+sprintf("The weight of %s is %f kg.", item, weight)
+
+# 範例2 
+items <- c("the apple", "the banana")
+weights <- c(3.2, 2.5)
+sprintf("The weight of %s is %.1f kg.", items, weights)
+
+```
+
+### 2.3 變數in字串-glue
+```{r}
+
+library(glue)
+
+name <- "Eric"
+age <- 42
+
+glue('Hello, {name}. You are {(age-1):age}.')
+
+```
+
+### 2.4 練習
+
+#### 練習1
+- 範例網址: https://www.ptt.cc/bbs/NBA/index6500.html
+- 請產出 index6450- index6500 的網址，並存於 all_urls
+
+```{r}
+library(glue)
+
+all_urls <- c()
+for (num in c(6450:6500)) {
+  url <- glue("https://www.ptt.cc/bbs/NBA/index{num}.html")
+  all_urls <- append(all_urls, url)
+}
+
+```
+
+#### 練習2
+- 將 heights, weights內的資料，對應索引位置後
+  - 產出如 "身高: 172, 體重: 60.2"
+
+```{r}
+heights <- c(172.1, 158.5, 163.3, 180.5)
+weights <- c(60.16, 50.35, 56.15, 73.05)
+
+all_data <- sprintf("身高: %0.f, 體重: %.1f", heights, weights)
+
+typeof(all_data)
+length(all_data)
+
+all_data[1]
+```
+
+## 3 stringr 字串處理
+
+- [官方介紹](https://stringr.tidyverse.org/)
+- [jefflinmd38-文字與字串資料處理](https://bookdown.org/jefflinmd38/r4biost/stringr.html)
+
+```{r}
+library("stringr")
+```
+
+### 3.1 合併
+```{r}
+
+# 多個 character
+str_c("medical", "statistics", "1", sep = "_")
+
+# 向量
+fruits <- c("apple", "banana", 20)
+str_c(fruits, collapse = ", ")
+
+```
+
+### 3.2 長度
+```{r}
+str_length("Apple")
+
+x <- c("why", "video", "cross", "extra", "deal", "authority")
+str_length(x) 
+
+
+```
+
+### 3.3 取部分
+```{r}
+phone_nums <- c("0910333111", "0911333123", "0912312341")
+str_sub(phone_nums, start = 1, end = 4)
+str_sub(phone_nums, start = -3, end = -1)
+
+```
+
+### 3.4 取代
+
+#### str_sub
+```{r}
+phone_nums <- c("0910333111", "0911333123", "0912312341")
+str_sub(phone_nums, start = -3, end = -1) <- "XXX"
+phone_nums
+
+```
+
+#### str_replace
+```{r}
+d <- c("活動A: 中獎號碼 01", "活動A: 中獎號碼 02")
+str_replace(d, "活動A", "特別活動")
+```
+
+### 3.5 開頭/結尾
+```{r}
+fruits <- c("Guava", "Apple", "Banana")
+
+str_starts(fruits, "G")
+str_ends(fruits, "a")
+
+```
+
+## 4 正則表達式
+
+- 偵測/處理字串更加靈活。
+- 常應用於文字資料處理相關工作，加速資料萃取、資料清洗等工作。
+- 藉由特有的表達規則，匹配文字資料中之特定字串。
+- 可瀏覽此網站進行練習和應用。 
+  - https://regex101.com/
+- 可儲存此網站作為快速筆記。
+  - https://cheatography.com/doublehelix/cheat-sheets/the-complete-regex/

@@ -1,0 +1,291 @@
+---
+title: "3-3 向量式運算"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1 比較效能
+
+> 以下範例，參考此文改寫 https://kemushi54.github.io/R-basic/loop.html
+
+### 1.1 產比較用資料
+
+```{r}
+# 用 runif 隨機產生 100 萬人的身高 (單位：公分)
+height <- runif(1000000)*40 + 165
+
+# 用 runif 隨機產生 100 萬人的體重 (單位：公斤)
+weight <- runif(1000000)*30 + 60
+
+# 合併成data.frame
+df <- data.frame(height = height,
+                   weight = weight)
+
+```
+
+
+### 1.2 用 system.time() 來測量幾種方法的運算效能
+
+- 1 for 迴圈
+- 2 向量化運算
+- 3 mapply
+- 4 map with purrr
+
+#### for 迴圈
+```{r for 迴圈}
+system.time({
+  BMI <- list()
+  for (i in 1:nrow(df)){
+    BMI[i] <- df$weight[i] / ((df$height[i]/100)^2)
+  }
+})
+
+
+```
+
+#### 向量化運算
+```{r 向量化運算}
+system.time(
+  df$bmi <- df$weight / ((df$height/100)^2)
+)
+```
+#### mapply
+```{r mapply}
+calc_bmi <- function (weight, height){
+  return (weight / ((height/100)^2))
+}
+
+
+system.time(
+  df$bmi <- mapply(calc_bmi, df$weight, df$height)
+)
+```
+
+#### map with purrr
+
+```{r map with purrr}
+library(purrr)
+
+system.time(
+  df$bmi <-  map2(df$weight, df$height, calc_bmi)
+)
+```
+
+## 2 apply 家族
+
+- The apply() Family
+  - https://www.datacamp.com/community/tutorials/r-tutorial-apply-family#family
+- R語言 apply，sapply，lapply，tapply，vapply, mapply的用法
+  - https://www.itread01.com/content/1520578697.html
+
+### 2.1 sapply
+simplified apply
+
+```{r}
+multiple_10 <- function(num) {num*10}
+
+t_data <- c(1,2,3,4,5)
+sapply(t_data, multiple_10)
+
+```
+
+### 2.2 mapply
+multiple apply
+
+```{r}
+add_2 <- function(x, y) {x+y}
+
+t_data_1 <- c(1,2,3,4,5)
+t_data_2 <- c(3,4,5,6,7)
+mapply(add_2, t_data_1, t_data_2)
+
+```
+
+
+## 3 purrr 套件
+
+參考文章
+- https://www.rebeccabarter.com/blog/2019-08-19_purrr/
+- https://jennybc.github.io/purrr-tutorial/
+
+```{r}
+library(purrr)
+```
+
+### 3.1 map系列
+```{r}
+multiple_10 <- function(num) {num*10}
+t_data <- c(1,2,3,4,5)
+
+# Return a list
+map(t_data, multiple_10)
+
+# Return a double vector
+map_dbl(t_data, multiple_10)
+
+```
+
+### 3.2 map2系列
+
+```{r}
+add_2 <- function(x, y) {x+y}
+t_data_1 <- c(1,2,3,4,5)
+t_data_2 <- c(3,4,5,6,7)
+
+
+# map2(t_data_1, t_data_2, add_2)
+map2_dbl(t_data_1, t_data_2, add_2)
+
+```
+
+### 3.3 波浪函數(tilde-dot shorthand)
+
+`~{}`
+- 節省寫 function的困擾
+- 波浪函數參數總是 .x (或是 .)
+- 其實可以是 `~(.x)`, `~.`
+
+```{r}
+# 獨立寫 function
+add_10 <- function(num) {
+  num+10
+}
+map_dbl(c(1, 2, 3, 4, 5), add_10)
+
+# 單行 function
+map_dbl(c(1, 2, 3, 4, 5), function(x){x+10})
+
+# 波浪函數
+map_dbl(c(1, 2, 3, 4, 5), ~{.x + 10})
+map_dbl(c(1, 2, 3, 4, 5), ~{. + 10})
+map_dbl(c(1, 2, 3, 4, 5), ~.+10)
+map_dbl(c(1, 2, 3, 4, 5), ~(.+10))
+
+# 注意以下兩個是錯的!!! 
+# map_dbl(c(1, 2, 3, 4, 5), ~{x + 10})
+# map_dbl(c(1, 2, 3, 4, 5), ~x+10)  
+```
+### 3.4 %>% 管線運算子 (pipe operator)
+
+magrittr套件中的功能。
+
+參考文章
+- https://blog.gtwang.org/r/r-pipes-magrittr-package/
+
+`%>%`運算子
+
+- 將 "%>% 左側的運算結果"，傳遞至 "%>%右側函數"作為第一個參數。
+
+- 其他運算子
+  - `%<>%`運算子
+  - `%$%` 運算子
+  - `%T>%` T 運算子
+
+```{r}
+add_10 <- function(num){x+10}
+muti_5 <- function(num){x*5}
+
+# function層 寫法
+x <- 10
+muti_5(add_10(x))
+
+# pipe %>%寫法
+x %>% 
+  add_10 %>%
+  muti_5
+
+```
+
+## 3.5 其他
+
+### Index
+```{r}
+fruits <- c("Apple", "Banana", "Gruva")
+nums <- c(1, 2, 3)
+users <- list(UserName="Jay", Age="20")
+
+# 選取
+pluck(fruits, 3)
+pluck(users, "Age")
+
+# 取代
+assign_in(fruits, 1, "Lemon")
+assign_in(users, "UserName", "Lee")
+
+
+```
+
+
+### Modify
+```{r}
+add_10 <- function(num) {
+  return(num+10)
+}
+
+# 無差別
+modify(c(1, 4, 7), add_10)
+
+# 某位置
+modify_at(c(1, 4, 7), 2, add_10)
+modify_in(c(1, 4, 7), 2, add_10)
+
+# 某條件
+modify_if(c(1, 4, 7), ~{.x>5}, add_10)
+
+```
+
+### Filter
+
+```{r}
+fruits <- c("Apple", "Banana", "Gruva")
+nums <- c(1, 4, 7, 10, NULL)
+
+# Find first element to pass.
+detect(nums, ~.x>5)
+
+# Select elements that pass a logical test.
+keep(nums, ~.x>5)
+
+# Drop empty elements.
+compact(nums)
+
+```
+
+
+## 練習
+
+### 練習1 
+
+從 userNames 當中，保留以 "J"開頭的名字。
+
+```{r}
+library(stringr)
+userNames <- c("Jay", "James", "Cathy", "Joe", "jen", "Frey")
+
+
+```
+
+### 練習2
+
+將 所有電話號碼
+1. 保留 09開頭 的。
+2. 保留 長度為10碼的。
+3. 將符合保留的號碼，各自的最後三碼改為 XXX。
+
+```{r}
+library(stringr)
+
+phone_nums <- c(
+  "03913131251", "0283112222", "110",
+  "0910331123", "0912314", "09adwqd",
+  "0910351123", "0922212333", "0933621333"
+)
+
+
+
+```
