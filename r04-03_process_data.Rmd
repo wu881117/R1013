@@ -1,0 +1,224 @@
+---
+title: "4-3 資料處理"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 0 環境包
+
+```{r}
+# install.packages("tidyverse")
+library("tidyverse")
+
+```
+
+# 1 關於 EDA 探索式資料分析
+
+EDA是什麼
+- 探索式資料分析(EDA, Exploratory data analysis)
+- 透過資料視覺化、敘述性統計進行資料初探，獲得基礎資訊。
+- [kaggle_eda範例](https://www.kaggle.com/heeraldedhia/exploratory-data-analysis-in-r)
+
+# 2 資料觀察簡述
+
+```{r}
+# 查看前五筆資料
+head(iris)
+
+# 看資料型態組成
+str(iris)
+
+# 做資料統計摘要
+summary(iris)
+
+# 視覺化
+hist(iris$Sepal.Length)
+```
+
+# 3 資料處理
+
+## 3.1 空值處理
+
+### 3.1.1 範例資料
+
+```{r}
+df_31 <- data.frame(
+  A = c(1, 2, NA),
+  B = c(5, NA, NA),
+  C = c(1, 2, 3)
+)
+
+df_31
+```
+
+### 3.1.2 確認是否有空值
+
+```{r}
+is.na(df_31)
+
+```
+
+### 3.1.3 排除有空值的rows
+
+```{r}
+# 排除所有欄位 有 NA 的 rows
+df_31 %>% drop_na()
+
+# 排除指定欄位中 有 NA 的 rows 
+df_31 %>% drop_na(A)
+df_31 %>% filter(!is.na(A))
+
+```
+
+### 3.1.4 填補空值
+
+```{r}
+# 填補
+replace_na(df_31, list(A=0, B=0))
+
+```
+
+## 3.2 重複值處理
+
+### 3.2.1 範例資料
+
+```{r}
+df_32 <- data.frame(
+  A = c(1, 2, 10),
+  B = c(5, 5, 6),
+  C = c(1, 2, 3)
+)
+
+df_32
+```
+
+### 3.2.2 排除有重複值的rows
+
+- 常見的三種方法
+  - https://www.datasciencemadesimple.com/remove-duplicate-rows-r-using-dplyr-distinct-function/
+```{r}
+
+# 會保留最後一個
+df_32 %>% distinct(B, .keep_all = TRUE)
+
+```
+
+## 3.3 資料萃取
+
+### 3.3.1 範例資料
+
+```{r}
+df_33 <- data.frame(
+  A = c(1, 2, 10),
+  B = c(5, 5, 6),
+  C = c(1, 2, 3)
+)
+
+df_33
+
+```
+
+### 3.3.2 挑選 rows
+
+```{r}
+df_33 %>% filter(A >2 & B>5)
+
+```
+
+### 3.3.2 挑選 column
+
+```{r}
+# 仍是 data.frame
+df_33 %>% select(A)
+
+# 直接挑出值
+df_33$A
+
+```
+
+
+## 3.4 依條件賦值
+
+### 3.4.1 範例資料
+
+```{r}
+
+df_34 <- data.frame(
+  Group = c("R", "R", "G"),
+  A = c(1, 2, 10),
+  B = c(5, 5, 6),
+  C = c(1, 2, 3)
+)
+
+df_34
+
+```
+
+### 3.4.2 計算後創新欄位
+
+```{r}
+# mutate
+df_34 <- df_34 %>% mutate(NewA = A*10)
+
+# 向量
+df_34$NewA <- df_34$A*30
+
+df_34
+
+```
+
+### 3.4.3 依照條件計算後賦值，創新欄位
+
+#### 方法2: ifelse
+```{r}
+df_34 %>% mutate(CGroup = ifelse(C<2, "A_2以下", "B_2以上"))
+
+```
+
+#### 方法1: sapply
+```{r}
+cut_c <- function(c) {
+  if (c < 2) {
+    return ("A_2以下")
+  }
+  return ("B_2以上")
+}
+
+df_34$CGroup <-
+  sapply(df_34$C, cut_c)
+
+df_34
+
+```
+
+
+# 4 練習
+
+```{r}
+
+# 1 請讀取 /raw/winemag-data_first150k.csv 內的資料，存於變數 df。
+df <- read_csv("./raw/winemag-data_first150k.csv")
+
+# 2. 請問 country 欄位，在排除 NA 值後，共有幾個特殊值?
+t <- filter(df, !is.na(country))
+length(unique(t$country))
+
+# 3. 請挑選出 country 為 US, 且 price 在 100 以上的 rows。
+df %>% filter(country == "US" & price > 100)
+
+# 4. 請創造一新欄位 NewPrice 為 Price*30。
+df %>% mutate(NewPrice = price*30)
+df$NewPrice <- df$price*30
+
+# 5. 請創造一新欄位 IsFrance
+# - 當 country==France 的時候，該值為 T。
+# - 當 country!=France 的時候，該值為 F。
+df %>% mutate(IsFrance = ifelse(country=='France', T, F))
+
+```
+

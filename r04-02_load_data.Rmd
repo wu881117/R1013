@@ -1,0 +1,208 @@
+---
+title: "4-2 資料讀取"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 環境包
+
+- tidyverse
+  - 可參考 https://bookdown.org/jefflinmd38/r4biost/basictidy.html
+- 相關引入
+  - ggplot2 數據視覺化。
+  - purrr 函數化與向量化。
+  - tibble 加強資料框。
+  - dplyr 資料操作與處理(Data transformation)。
+  - tidyr 資料清洗(Data tidying)。
+  - stringr 處理字串。
+  - readr 讀取資料。
+  - forcats 處理類別變數 (factors)。
+
+```{r}
+# install.packages("tidyverse")
+library("tidyverse")
+
+```
+
+
+## 1 讀取 R內建資料集
+
+### 1.1 查看資料集有哪些
+```{r}
+# 查看全部
+data()
+
+# 查看某 package 所內建的資料集
+data(package="ggplot2")
+
+```
+
+### 1.2 讀取內建資料集
+
+#### 範例 iris
+```{r}
+# 查看 資料集說明
+help(iris)
+
+# 載入
+iris_data <- iris
+
+# 查看型態
+class(iris_data) # "data.frame"
+
+# 調用某欄位
+iris_data$Sepal.Length
+
+```
+
+#### 範例 mtcars
+```{r}
+# 查看 資料集說明
+help(mtcars)
+
+# 載入 mtcars
+mtcars_data <- mtcars
+
+# 查看型態
+class(mtcars_data) # "data.frame"
+
+# 調用某欄位
+mtcars_data$mpg
+```
+
+## 2 讀取 各式檔案
+
+### 2.1 csv
+
+- with readr
+  - https://readr.tidyverse.org/
+```{r}
+members <- read_csv("./raw/members.csv")
+class(members)
+
+members
+```
+
+### 2.2 excel
+
+- with readxl
+  - https://readxl.tidyverse.org/
+```{r}
+library("readxl")
+members <- read_xlsx("./raw/members.xlsx")
+
+```
+
+### 2.3 json
+
+- with jsonlite
+  - https://rdrr.io/cran/jsonlite/man/fromJSON.html
+```{r}
+library("jsonlite")
+fruits <- read_json("./raw/fruits.json") # list
+class(fruits)
+
+fruits <- fromJSON("./raw/fruits.json") # data.frame
+class(fruits)
+
+```
+
+### 2.4 txt(結構化)
+
+- with readr
+  - https://readr.tidyverse.org/
+```{r}
+members <- read_delim("./raw/members.txt", delim = " ")
+
+```
+
+### 2.5 txt(非結構化)
+
+- with readr
+  - https://readr.tidyverse.org/
+```{r}
+lyrics <- read_lines("./raw/lyrics.txt")
+
+```
+
+### 2.6 google sheet
+
+- with googlesheets4
+  - https://googlesheets4.tidyverse.org/
+```{r}
+library("googlesheets4")
+sheet1 <- read_sheet("https://docs.google.com/spreadsheets/d/1ZCesM-3Dqq7z8RGaLI8MQWe1UeHGPeBkF4w_3-ALRs8", sheet = "報表1")
+sheet2 <- read_sheet("https://docs.google.com/spreadsheets/d/1ZCesM-3Dqq7z8RGaLI8MQWe1UeHGPeBkF4w_3-ALRs8", sheet = 2)
+
+```
+
+## 3 輸出 各式檔案
+
+### 3.1 csv
+
+- with readr
+  - https://readr.tidyverse.org/
+```{r}
+write_csv(iris, "./practice/iris_test.csv")
+
+```
+
+### 3.2 excel
+
+- with openxlsx
+  - https://cran.r-project.org/web/packages/openxlsx/index.html
+```{r}
+# install.packages("openxlsx")
+library("openxlsx")
+openxlsx::write.xlsx(iris, file = "./practice/iris_test.xlsx", overwrite = T)
+
+```
+
+### 3.3 json
+
+- with jsonlite
+  - https://rdrr.io/cran/jsonlite/man/fromJSON.html
+```{r}
+# 將 data.frame 轉為 json格式
+iris_json <- toJSON(iris)
+
+# 輸出
+write_json(iris_json, "./practice/iris_test.json")
+
+```
+
+### 3.4 txt
+
+- with readr
+  - https://readr.tidyverse.org/
+```{r}
+# 格式化
+write_delim(iris, "./practice/iris_test.txt", delim = ", ")
+
+# 非格式化
+news <- "MLB美國職棒大聯盟第6戰，
+亞特蘭大勇士前役雖遭到休士頓太空人逆轉，
+無緣在自家球迷面前封王，
+但今天（3日）在重砲打線Jorge Soler、Dansby Swanson、Freddie Freeman紛紛開轟加持，以及先發投手Max Fried繳出6局無失分好投率領下，
+最終客場7比0完封了太空人，以系列賽4比2拿下了睽違26年的世界大賽王座。"
+write_file(news, "./practice/test.txt")
+
+```
+
+
+### 4 關於 資料夾/檔案 的幾個觀念
+
+資料夾/檔名 命名上
+1.盡量不要有空格，用底線替代(ex: 'test 1.csv' -> 'test_1.csv')。
+2. 盡量不要用數字開頭(ex: '1.csv'->'a1.csv')。
+3. 盡量有規則，好辨識(ex: 'airdata_20211022.csv')。
+4. 要有"刪除/覆蓋/備份"的評估，不能隨意操作。
+5. 要有層級性，較有架構。
+
+關於路徑觀念
+- 可參考 https://bookdown.org/wangminjie/R4DS/tidyverse-readr.html

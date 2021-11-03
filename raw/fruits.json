@@ -1,0 +1,20 @@
+[
+    {
+        "fruit": "Apple",
+        "size": "Large",
+        "color": "Red",
+        "price": 50
+    },
+    {
+        "fruit": "Banana",
+        "size": "Large",
+        "color": "Yellow",
+        "price": 40
+    },
+    {
+        "fruit": "Orange",
+        "size": "Small",
+        "color": "Orange",
+        "price": 25
+    }
+]
