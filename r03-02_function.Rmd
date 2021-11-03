@@ -33,7 +33,7 @@ say_hello <- function(){
 ## 2 不吃參數的function
 
 ```{r}
-say_hello <- function(){
+say_hello <- function(  ){
   print("hello!")
 }
 

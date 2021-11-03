@@ -103,7 +103,7 @@ df_32
   - https://www.datasciencemadesimple.com/remove-duplicate-rows-r-using-dplyr-distinct-function/
 ```{r}
 
-# 會保留最後一個
+# 會保留第一個
 df_32 %>% distinct(B, .keep_all = TRUE)
 
 ```
@@ -126,7 +126,9 @@ df_33
 ### 3.3.2 挑選 rows
 
 ```{r}
-df_33 %>% filter(A >2 & B>5)
+filter(df_33, A>2)
+
+df_33 %>% filter(A >2)
 
 ```
 
@@ -163,12 +165,13 @@ df_34
 
 ```{r}
 # mutate
+
 df_34 <- df_34 %>% mutate(NewA = A*10)
 
 # 向量
 df_34$NewA <- df_34$A*30
 
-df_34
+df_34$A*30
 
 ```
 
@@ -176,6 +179,7 @@ df_34
 
 #### 方法2: ifelse
 ```{r}
+df_34
 df_34 %>% mutate(CGroup = ifelse(C<2, "A_2以下", "B_2以上"))
 
 ```
@@ -189,10 +193,12 @@ cut_c <- function(c) {
   return ("B_2以上")
 }
 
+cut_c(3)
+
 df_34$CGroup <-
   sapply(df_34$C, cut_c)
 
-df_34
+
 
 ```
 
