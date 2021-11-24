@@ -1,0 +1,280 @@
+---
+title: "6-4 獲取 json api"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1 抓取json格式API
+
+## 1.1 jsonlite
+
+- https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html
+
+```{r message=FALSE, warning=FALSE}
+# install.packages("jsonlite")
+# install.packages("tidyverse")
+library("tidyverse")
+library("jsonlite")
+
+```
+
+
+## 1.2 範例1-AQI
+- 小時等級
+  - [空氣品質指標(AQI)](https://data.gov.tw/dataset/40448)
+    - 20211113時查看到的
+    - [json位置](https://data.epa.gov.tw/api/v1/aqx_p_432?limit=1000&api_key=9be7b239-557b-4c10-9775-78cadfc555e9&sort=ImportDate%20desc&format=json)
+    - [舊版json位置](http://opendata.epa.gov.tw/ws/Data/AQI/?$format=json)
+- 日等級
+  - [日空氣品質指標(AQI)](https://data.gov.tw/dataset/40507)
+
+```{r}
+
+# AQI API 網址
+url <- "https://data.epa.gov.tw/api/v1/aqx_p_432?limit=1000&api_key=9be7b239-557b-4c10-9775-78cadfc555e9&sort=ImportDate%20desc&format=json"
+
+# 使用 jsonlite::fromJSON 抓取
+res <- jsonlite::fromJSON(url)
+
+# 取得資料
+df <- res$records
+
+# 取得下一頁網址
+res['_links']
+
+```
+
+## 1.3 範例2-Dcard API v2
+
+- 可參考此篇文章整理
+  - https://blog.jiatool.com/posts/dcard_api_v2/
+- 示範: 抓取首頁文章
+  - 網址: https://www.dcard.tw/f
+  - API網址: https://www.dcard.tw/service/api/v2/posts
+
+### 1.3.1 抓取 熱門文章100篇 API 網址
+```{r}
+url <- "https://www.dcard.tw/service/api/v2/posts?popular=true&limit=100"
+res <- jsonlite::fromJSON(url)
+
+# 看看這100篇熱門都是哪些版的文章, 並以平均按讚數排序
+res %>% 
+  group_by(forumName) %>%
+  summarise(
+    postCount = n_distinct(id),
+    likeCount_Max = max(likeCount),
+    likeCount_Mean = mean(likeCount),
+    likeCount_sum = sum(likeCount)) %>%
+  arrange(desc(likeCount_Mean))
+
+```
+
+### 1.3.2 抓取 所有看板名稱
+```{r}
+url <- "https://www.dcard.tw/service/api/v2/forums"
+res <- jsonlite::fromJSON(url)
+
+# 大家都追蹤什麼呢?^.< - 挑出隱藏的看板, 並以 subscriptionCount 排序
+forums_invisible <- res %>% 
+  filter(invisible == T) %>%
+  arrange(desc(subscriptionCount))
+
+```
+
+### 1.3.3 抓取 氣象局 各測站之 現在氣溫
+
+- 1 說明網址
+  - https://opendata.cwb.gov.tw/dataset/observation/O-A0003-001
+- 2 請註冊後取得金鑰
+- 3 爬取
+
+```{r}
+
+# 0 API網址與取得之token
+token <- ""
+url <- paste0("https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0003-001?Authorization=", token, "&elementName=TEMP")
+
+# 1 爬取
+res <- fromJSON(url)
+df <- data.frame(res$records)
+
+```
+
+
+# 2 練習(抓取與應用)
+
+## 2.1 YouBike臺北市站位每月使用量
+
+- 1 請找到此網頁上之 json API 位置，將資料抓取下來。
+  - https://data.taipei/#/dataset/detail?id=d8cefb03-aba2-41ca-9996-d8774313cdc6
+- 2 試著繪出逐月使用量的line chart
+
+```{r}
+## 以下為參考示意
+
+# 1 爬取
+url <- "https://data.taipei/api/v1/dataset/8f690548-61bc-4bff-8baa-01d465eb672c?scope=resourceAquire"
+res <- fromJSON(url) 
+
+# 2 取出資料
+df <- res$result$results
+
+# 3 前處理
+parse_m <-function(originM) {
+  # 將民國X年M月，轉為西元 並為 時間格式
+  t <- str_split(originM, "年")[[1]]
+  y <- (as.integer(t[1])+1911)
+  m <- as.integer(str_split(t[2], "月")[[1]][1])
+  
+  ym <- paste0(y, "-", m, "-", "01")
+  ym <- as.Date(ym, format="%Y-%m-%d")
+
+  return(ym)
+}
+# 欄位重新命名, 處理時間欄位
+  # 當欄位名稱以底線開頭時, 可以用 `_xxxx` 調用
+df1 <- df %>%
+  rowwise() %>% 
+  rename(id = `_id`, originYM = 臺北市YouBike每月使用量) %>%
+  mutate(YM = parse_m(originYM))
+
+# 4 繪圖
+ggplot(
+  data = df1, 
+  aes(x = YM, y = 次數, group=1)) +
+  geom_line() + 
+  geom_point() +
+  scale_x_date(date_labels = "%Y%m")
+
+```
+
+
+## 2.2 新北市公共自行車各站點即時資料
+
+- 1 請找到此網頁上之 json API 位置，將資料抓取下來。
+  - https://reurl.cc/73A6Wk
+- 2 查看各行政區(sarea)的 "啟用站點" 數量排名
+- 3 欄位說明
+  - sno(站點代號)、sna(中文場站名稱)
+  - tot(場站總停車格)、sbi(可借車位數)
+  - sarea(中文場站區域)、mday(資料更新時間)
+  - lat(緯度)、lng(經度)
+  - ar(中文地址)、sareaen(英文場站區域)
+  - snaen(英文場站名稱)、aren(英文地址)
+  - bemp(可還空位數)、act(場站是否暫停營運)
+
+```{r}
+## 以下為參考示意
+
+# 1 爬取
+url <- "https://data.ntpc.gov.tw/api/datasets/71CD1490-A2DF-4198-BEF1-318479775E8A/json?page=0&size=1000"
+df <- fromJSON(url) 
+
+# 2 查看是否有尚未啟用的
+df %>% 
+  filter(act != 1)
+
+# 3 查看有哪些行政區
+distinct(df, sarea)
+
+# 4 查看各行政區(sarea)的啟用站點數量排名
+df %>% 
+  filter(act == 1) %>%
+  group_by(sarea) %>%
+  summarise(snoCount = n_distinct(sno)) %>%
+  arrange(desc(snoCount))
+
+```
+
+## 2.3 自由時報 NBA 文章列表
+
+- 1 嘗試使用 "開發者工具" 找到該網址調用的資料(XHR)來源
+  - 自由時報體育 https://sports.ltn.com.tw/breakingnews
+- 2 將資料抓下，並嘗試換頁
+
+```{r}
+## 以下為參考示意
+
+# 1 爬取
+url <- "https://sports.ltn.com.tw/list_ajax/nba/1"
+df <- fromJSON(url) 
+
+head(df %>% select(title, url))
+
+```
+
+## 2.4 氣象局 各測站之 現在氣溫
+
+- 1 說明網址
+  - https://opendata.cwb.gov.tw/dataset/observation/O-A0003-001
+- 2 請註冊後取得金鑰
+- 3 爬取
+
+```{r}
+
+# 0 API網址與取得之token
+token <- ""
+url <- paste0("https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0003-001?Authorization=", token, "&elementName=TEMP")
+
+# 1 爬取
+res <- fromJSON(url)
+df <- data.frame(res$records)
+
+# 2.1 前處理 - 挑出資訊
+df <- df %>%
+  rowwise() %>%
+  mutate(
+    TEMP = as.numeric(location.weatherElement$elementValue),
+    CITY = location.parameter$parameterValue[[1]],
+    TOWN = location.parameter$parameterValue[[3]],
+    LNG = as.numeric(location.lon),
+    LAT = as.numeric(location.lat)
+  ) 
+
+# 2.2 前處理 - 欄位挑選與處理異常
+df <- df %>%
+  filter(TEMP != -99) %>%
+  select(CITY, TOWN, LNG, LAT, TEMP)
+
+# 3 以溫度做排序
+df <- df %>%
+  arrange(desc(TEMP))
+
+# 4 地圖視覺化範例
+library(leaflet) # install.packages("leaflet")
+
+set_tempColor <- function(temp) {
+  color <- ""
+  if (temp >= 30) {
+    color <- "red"
+  } else if (temp >=20) {
+    color <- "orange"
+  } else if (temp >= 10) {
+    color <- "green"
+  } else {
+    color <- "blue"
+  }
+  return(color)
+}
+
+map <- leaflet() %>%
+  addTiles() %>%
+  addMarkers(lng=121.4501143, lat=25.1764033, popup="商管大樓") %>%
+  setView(lng = 120.5825975, lat = 23.583234, zoom = 6) %>%
+  addCircleMarkers(
+    lng = df$LNG, 
+    lat = df$LAT, 
+    label = df$TOWN,
+    color = sapply(df$TEMP, set_tempColor),
+    fill = T,
+    radius = 2
+    )
+map  # 繪製地圖
+
+```
+

@@ -1,0 +1,72 @@
+<html>
+
+<head>
+    <title>網頁練習</title>
+
+    <!-- 內部 css -->
+    <style>
+        p.text {
+            font-style: italic;
+        }
+
+        p.text.first {
+            font-weight: 700;
+            color: blue;
+        }
+
+        div.item-box {
+            padding: 10px 30px;
+            border: gray 1px dashed;
+            margin-top: 10px;
+        }
+
+        .box-img {
+            height: 200px;
+            width: 400px;
+            object-fit: cover;
+        }
+
+        #box1 {
+            border-color: indianred;
+        }
+    </style>
+
+    <!-- 外部 css -->
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+
+</head>
+
+<body>
+    <h1 class="page-title">我們寫的練習用網頁</h1>
+    <div class="item-box" id="box1">
+        <h2 class="box-title">Fruits</h2>
+        <img class="box-img" id="img1">
+        <p class="text first">banana</p>
+        <p class="text" style="color:lightcoral">apple</p>
+        <p class="text">guava</p>
+    </div>
+    <div class="item-box" id="box2">
+        <h2 class="box-title">Animals</h2>
+        <img class="box-img" id="img2">
+        <p class="text first">dog</p>
+        <p class="text">cat</p>
+        <p class="text">fish</p>
+    </div>
+
+    <!-- 內部 js -->
+    <script type="text/javascript">
+        var img1 = document.getElementById("img1");
+        img1.src = "https://www.fao.org/uploads/pics/Tropical_Fruits_Network_Visual.jpg";
+
+        var img2 = document.getElementById("img2");
+        img2.src = "https://a-z-animals.com/media/2021/01/mammals-400x300.jpg";
+
+        console.log("Hi 妳／你好");
+        console.log("可愛的貓貓在這 https://www.instagram.com/songyy_cat/")
+    </script>
+
+    <!-- 外部 js -->
+    <!-- <script src="myScript.js"></script> -->
+</body>
+
+</html>

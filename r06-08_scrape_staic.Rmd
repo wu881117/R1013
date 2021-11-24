@@ -1,0 +1,94 @@
+---
+title: "6-10 爬蟲與資料處理練習"
+author: "kbjiyu"
+date: "2021/10/09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# 1 rvest 套件
+- rvest
+  - [官網與簡單範例](https://rvest.tidyverse.org/)
+  - https://www.rdocumentation.org/packages/rvest/versions/1.0.2
+    - 注意有版本差異。
+
+- 常用的css selector
+  - https://www.w3schools.com/cssref/css_selectors.asp
+
+```{r message=FALSE, warning=FALSE}
+# rvest
+# install.packages("rvest")
+library(rvest)
+library(tidyverse)
+
+# 查看 version
+packageVersion("rvest") # 1.0.2
+
+```
+
+# 2 範例
+## 2.1 範例1 html文字串
+```{r}
+html_doc <- "
+<html>
+<head>
+    <title>The Dormouse's story</title>
+</head>
+<body>
+    <p class='title'><b>The Dormouse's story</b></p>
+    <p class='story'>Once upon a time there were three little sisters; and their names were
+        <a href='http://example.com/elsie' class='sister' id='link1'>Elsie</a>,
+        <a href='http://example.com/lacie' class='sister' id='link2'>Lacie</a> and
+        <a href='http://example.com/tillie' class='sister' id='link3'>Tillie</a>;
+        <a href='http://example.com/tillie' class='brother' id='link4'>Ken</a>;
+        <a href='http://example.com/tillie' class='brother' id='link5'>Sam</a>;        
+        <a href='http://example.com/tillie' class='father' id='link6'>Lord</a>;                
+        and they lived at the bottom of a well.</p>
+    <p class='story'>...</p>
+</body>
+</html>
+"
+webpage <- read_html(html_doc)
+
+# 查看類型
+class(webpage)
+
+# 選出 目標元素群(elements)
+webpage %>%
+  html_elements("a") 
+
+```
+
+## 2.2 範例2 - r06-05_webpage.html
+```{r}
+
+# 爬取 目標網頁
+url <- "./r06-05_webpage.html"
+webpage <- read_html(url)
+
+# 選出 目標元素群(elements)
+webpage %>%
+  html_elements("p.text") 
+
+# 選出 目標元素(第一個符合的)
+webpage %>%
+  html_element("p.text") %>%
+  html_text2()
+
+# 選出 目標元素 的 屬性
+webpage %>% 
+  html_element("#img1") %>% 
+  html_attr("class")
+
+```
+
+## 2.3 範例3 - ptt
+```{r}
+
+
+```
+

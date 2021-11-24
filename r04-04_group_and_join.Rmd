@@ -1,0 +1,97 @@
+---
+title: "4-4 資料分組與合併"
+author: "kbjiyu"
+date: "2021/10/06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 0 環境包
+
+```{r}
+# install.packages("tidyverse")
+library("tidyverse")
+
+```
+
+# 1 group by
+
+- https://dplyr.tidyverse.org/reference/group_by.html
+
+## 1.1 官方範例
+```{r}
+# 查看 mtcars 資料集
+head(mtcars)
+
+mtcars %>% 
+  group_by(cyl) %>%
+  summarise(avg = mean(mpg))
+```
+
+## 1.2 資料集練習
+```{r}
+df <- read_csv("./raw/winemag-data_first150k.csv")
+
+```
+
+```{r}
+names(df)
+
+df %>% 
+  rename(rindex = ...1) %>%
+  group_by(country) %>%
+  summarise(
+    UniqueProvince = length(unique(province)),
+    MaxPrice = max(price)
+)
+
+```
+
+# 2 join with dplyr
+
+## 2.1 資料
+```{r}
+df1 <- data.frame(
+  MemberId = c(1:5), 
+  FavoriteFruit = c(rep("Apple", 3), 
+              rep("Orange", 2)))
+df2 <- data.frame(
+  MemberId = c(2, 4, 6), 
+  Class = c(rep("A", 2), 
+            rep("B", 1)))
+
+df1
+```
+
+## 2.2 範例
+
+### Inner join: 取交集
+```{r}
+# library(dplyr)
+
+inner_join(df1, df2, by="MemberId")
+```
+
+### Outer join: 取聯集
+```{r}
+# library(dplyr)
+full_join(df1, df2, by="MemberId")
+
+```
+
+### Left join: 以左側為主
+```{r}
+# library(dplyr)
+left_join(df1, df2, by="MemberId")
+
+```
+
+### Right join: 以右側為主
+```{r}
+# library(dplyr)
+right_join(df1, df2, by="MemberId")
+
+```
