@@ -1,0 +1,395 @@
+---
+title: "6-10 爬蟲與資料處理練習"
+author: "kbjiyu"
+date: "2021/10/09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# 1 rvest 套件
+- rvest
+  - [官網與簡單範例](https://rvest.tidyverse.org/)
+  - https://www.rdocumentation.org/packages/rvest/versions/1.0.2
+    - 注意有版本差異。
+
+- 常用的css selector
+  - https://www.w3schools.com/cssref/css_selectors.asp
+- 好用的工具
+  - selectorgadget
+    - https://rvest.tidyverse.org/articles/articles/selectorgadget.html
+
+```{r message=FALSE, warning=FALSE}
+# rvest
+# install.packages("rvest")
+library(rvest)
+library(tidyverse)
+
+# 查看 version
+packageVersion("rvest") # 1.0.2
+
+```
+
+# 2 rvest 爬取範例
+## 2.1 範例1 html文字串
+```{r}
+html_doc <- "
+<html>
+<head>
+    <title>The Dormouse's story</title>
+</head>
+<body>
+    <p class='title'><b>The Dormouse's story</b></p>
+    <p class='story'>Once upon a time there were three little sisters; and their names were
+        <a href='http://example.com/elsie' class='sister' id='link1'>Elsie</a>,
+        <a href='http://example.com/lacie' class='sister' id='link2'>Lacie</a> and
+        <a href='http://example.com/tillie' class='sister' id='link3'>Tillie</a>;
+        <a href='http://example.com/tillie' class='brother' id='link4'>Ken</a>;
+        <a href='http://example.com/tillie' class='brother' id='link5'>Sam</a>;        
+        <a href='http://example.com/tillie' class='father' id='link6'>Lord</a>;                
+        and they lived at the bottom of a well.</p>
+    <p class='story'>...</p>
+</body>
+</html>
+"
+webpage <- read_html(html_doc)
+
+# 查看類型
+class(webpage)
+
+# 選出 目標元素群(elements)
+webpage %>%
+  html_elements("a") 
+
+```
+
+## 2.2 範例2 - r06-05_webpage.html
+```{r}
+
+# 爬取 目標網頁
+url <- "./r06-05_webpage.html"
+webpage <- read_html(url)
+
+# 選出 目標元素群(elements)
+webpage %>%
+  html_elements("p.text") 
+
+# 選出 目標元素(第一個符合的)
+webpage %>%
+  html_element("p.text") %>%
+  html_text2()
+
+# 選出 目標元素 的 屬性
+webpage %>% 
+  html_element("#img1") %>% 
+  html_attr("class")
+
+```
+
+## 2.3 範例3 - ptt web
+
+### 2.3.1 找到目前 NBA看板 最新的文章列表 index號
+```{r}
+# 1 爬取 最新頁文章列表
+url <- "https://www.ptt.cc/bbs/NBA/index.html"
+webpage <- read_html(url)
+
+# 2 找到 上一頁的連結
+last_href <- webpage %>%
+  html_elements(".btn-group.btn-group-paging a.btn:nth-child(2)") %>%
+  html_attr("href")
+
+# 3 獲取最新頁的連結
+last_index_num <- as.integer(str_split(str_split(last_href, "index")[[1]][2], "\\.")[[1]][1])
+latest_index_num <- last_index_num + 1 
+latest_href <- paste0("https://www.ptt.cc/bbs/NBA/index", latest_index_num, ".html")
+latest_href
+
+```
+
+
+
+### 2.3.2 爬取 NBA看板 某頁文章列表
+```{r}
+# 1 爬取 某頁文章列表
+url <- "https://www.ptt.cc/bbs/NBA/index6500.html"
+webpage <- read_html(url)
+
+# 2 選出 目標列表中 單一文章 元素(elements)
+ele_posts <- webpage %>%
+  html_elements(".r-ent")
+
+# 3 蒐集 文章資訊
+posts_title <- c()
+posts_link <- c()
+post_date <- c()
+
+for (ele_p in ele_posts){
+  # 3.1 取出 單一文章標題
+  p_title <- ele_p %>% 
+    html_element(".title") %>% 
+    html_text2()
+  posts_title <- append(posts_title , p_title)
+
+  # 3.2 取出 單一文章連結
+  p_link <- ele_p %>% 
+    html_element(".title a") %>% 
+    html_attr("href")
+  posts_link <- append(posts_link , p_link)  
+
+  # 3.3 取出 單一文章日期
+  p_date <- ele_p %>%
+    html_element(".date") %>%
+    html_text2()
+  post_date <- append(post_date , p_date)  
+}
+
+# 4 將蒐集資料 轉為 data.frame
+df_posts <- data.frame(post_date, posts_title, posts_link)
+
+```
+
+### 2.3.3 將上述函數化
+
+```{r}
+get_latestIndex <- function(board_name) {
+  # 1 爬取 最新頁文章列表
+  url <- paste0("https://www.ptt.cc/bbs/", board_name, "/index.html")
+  webpage <- read_html(url)
+  
+  # 2 找到 上一頁的連結
+  last_href <- webpage %>%
+    html_elements(".btn-group.btn-group-paging a.btn:nth-child(2)") %>%
+    html_attr("href")
+  
+  # 3 獲取最新頁的 index
+  last_index_num <- as.integer(str_split(str_split(last_href, "index")[[1]][2], "\\.")[[1]][1])
+  latest_index_num <- last_index_num + 1  
+  
+  return(latest_index_num)  
+}
+
+```
+
+```{r}
+get_boardPosts <- function(board_name, index) {
+
+  # 1 爬取某版，某index之文章列表
+  url <- paste0("https://www.ptt.cc/bbs/", board_name,"/index", index, ".html")
+  print(paste0("> 開始爬取", url))
+  webpage <- read_html(url)
+  
+  # 2 選出 目標列表中 單一文章 元素(elements)
+  ele_posts <- webpage %>%
+    html_elements(".r-ent")
+  
+  # 3 蒐集 文章資訊
+  posts_title <- c()
+  posts_link <- c()
+  post_date <- c()
+  
+  for (ele_p in ele_posts){
+    # 3.1 取出 單一文章標題
+    p_title <- ele_p %>% 
+      html_element(".title") %>% 
+      html_text2()
+    posts_title <- append(posts_title , p_title)
+  
+    # 3.2 取出 單一文章連結
+    p_link <- ele_p %>% 
+      html_element(".title a") %>% 
+      html_attr("href")
+    posts_link <- append(posts_link , p_link)  
+  
+    # 3.3 取出 單一文章日期
+    p_date <- ele_p %>%
+      html_element(".date") %>%
+      html_text2()
+    post_date <- append(post_date , p_date)  
+  }
+  
+  # 4 將蒐集資料 轉為 data.frame
+  df_posts <- data.frame(post_date, posts_title, posts_link)  
+    
+  
+  return(df_posts)
+}
+
+```
+
+
+### 2.3.4 爬取多個頁面
+
+```{r}
+
+# 參數
+board_name <- "NBA"
+pages_count <- 10
+
+# 蒐集用
+all_posts <- data.frame()
+
+# 爬取
+latest_index <- get_latestIndex(board_name)
+start_index <- latest_index-pages_count+1
+
+for (idx in c(start_index:latest_index)){
+  df_post <- get_boardPosts(board_name, idx)
+  all_posts <- bind_rows(all_posts, df_post)
+  
+  # 每頁爬完休息 0.3 秒
+  Sys.sleep(0.3)
+}
+
+```
+
+# 3 關於異常處理
+
+- 常見出現異常的原因?
+  - 資料缺陷
+    - 未知/未處理過之資料(ex 網頁資料)。
+  - 程式碼未考量完善。
+  - 網路連線問題。
+- 異常造成之影響
+  - 程式中斷執行。
+  - 資料處理有誤。
+- 處理異常思維: 
+  - 當已知/未知異常發生時。
+  - 我們要保證整體程式碼能夠繼續運行。
+  - 最好要記錄下，是哪裡出現異常，以便於後續處理。
+  
+## 3.1 tryCatch
+
+關於 tryCatch
+- tryCatch有四個部分
+  - expr: [Required] R code(s) to be evaluated
+  - error : [Optional] What should run if an error occured while evaluating the codes in expr
+  - warning : [Optional] What should run if a warning occured while evaluating the codes in expr
+  - finally : [Optional] What should run just before quitting the tryCatch call, irrespective of if expr ran successfully, with an error, or with a warning
+
+### 3.1.1 tryCatch 範例 1
+- 可參考
+  - https://stackoverflow.com/questions/12193779/how-to-write-trycatch-in-r
+  - https://www.cnblogs.com/cloudtj/articles/5492096.html
+
+```{r}
+tryCatch(
+  # expr 區塊 - 放入欲嘗試執行之程式碼
+  expr = {
+    print("[expr]: 1 執行開始")
+    print(var1) # <- 這裡會有錯誤，因為沒有變數 var1。
+    print("[expr]: 2 因上方有錯誤，不會被執行到")
+  }, 
+  warning = function(war) {
+    # warning 區塊 - 當 expr 有警告產生時，會執行此區塊。
+    print(paste0("[warning]: ", war))
+  }, 
+  
+  error = function(err) {
+    # error 區塊 - 當 expr 有錯誤產生時，會執行此區塊。
+    # print(err)
+    print(paste0("[error]: ", conditionMessage(err)))
+  }
+  ,
+  finally = {
+    # finally 區塊 - 無論是否有警告、或是錯誤，都會執行此區塊。
+    print("[finally]: 完成訊息")
+  }
+)
+
+```
+### 3.1.2 tryCatch 範例 2
+```{r}
+log_calculator <- function(x){
+  y <- NA
+  tryCatch(
+    expr = {
+      y <- log(x)
+      message(y)
+      message("Successfully executed the log(x) call.")
+    },
+    error = function(e){
+      message('Caught an error!')
+      print(e)
+    },
+    warning = function(w){
+      message('Caught an warning!')
+      print(w)
+    },
+    finally = {
+      message('All done, quitting.')
+      return(y)
+    })    
+}
+
+# A valid case
+z <- log_calculator(10)
+z
+
+# A "warning" case
+z <- log_calculator(-10)
+z
+
+
+# An "error" case
+z <- log_calculator("log_me")
+z
+
+```
+
+## 3.2 try
+```{r}
+# 範例1
+try(x<-5)
+
+# 範例2
+try(log("a"))
+print(.Last.value)
+
+# 範例3
+for (x in c(1, "x", 5)){
+  print(x)
+  print(log(x))
+}
+
+for (x in c(1, "x", 5)){
+  print(x)
+  print(try(log(x)))
+}
+
+
+```
+
+
+# 4 爬蟲練習
+
+## 4.1 tidyverse - starwars
+- https://rvest.tidyverse.org/articles/starwars.html
+
+```{r}
+# 爬取 目標網頁
+url <- ""
+webpage <- read_html(url)
+
+# 選出 目標元素群(elements)
+webpage %>%
+  html_elements("") 
+
+```
+
+## 4.2 travel.ettoday.net
+- https://travel.ettoday.net/category/%E6%A1%83%E5%9C%92/
+
+```{r}
+# 爬取 目標網頁
+url <- ""
+webpage <- read_html(url)
+
+# 選出 目標元素群(elements)
+webpage %>%
+  html_elements("") 
+
+```
